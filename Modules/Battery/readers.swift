@@ -22,6 +22,7 @@ internal class UsageReader: Reader<Battery_Usage> {
     
     deinit {
         self.stop()
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
         if self.service != 0 {
             IOObjectRelease(self.service)
             self.service = 0
@@ -61,6 +62,25 @@ internal class UsageReader: Reader<Battery_Usage> {
         }
         self.source = nil
         self.loop = nil
+    }
+    
+    public override func setup() {
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(self.wakeListener),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func wakeListener() {
+        self.read()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.read()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+            self?.read()
+        }
     }
     
     public override func read() {
