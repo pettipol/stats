@@ -161,11 +161,13 @@ internal class UsageReader: Reader<Battery_Usage> {
                     }
                 }
                 
+                var usage = self.usage
                 DispatchQueue.global(qos: .background).async { [weak self] in
                     guard let self = self else { return }
                     let usbDevices = self.readUSBDevices()
                     DispatchQueue.main.async {
-                        self.usage.usbDevices = usbDevices
+                        usage.usbDevices = usbDevices
+                        self.usage = usage
                         self.callback(self.usage)
                     }
                 }

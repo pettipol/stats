@@ -381,29 +381,31 @@ public class BatteryWidget: WidgetWrapper {
         var updated: Bool = false
         let timeFormat: String = Store.shared.string(key: "\(self.title)_timeFormat", defaultValue: self.timeFormat)
         
-        if self._percentage != percentage {
-            self._percentage = percentage
-            updated = true
-        }
-        if let status = ACStatus, self._ACStatus != status {
-            self._ACStatus = status
-            updated = true
-        }
-        if let charging = isCharging, self._charging != charging {
-            self._charging = charging
-            updated = true
-        }
-        if let time = time, self._time != time {
-            self._time = time
-            updated = true
-        }
-        if self.timeFormat != timeFormat {
-            self.timeFormat = timeFormat
-            updated = true
-        }
-        if let state = optimizedCharging, self._optimizedCharging != state {
-            self._optimizedCharging = state
-            updated = true
+        self.queue.sync {
+            if self._percentage != percentage {
+                self._percentage = percentage
+                updated = true
+            }
+            if let status = ACStatus, self._ACStatus != status {
+                self._ACStatus = status
+                updated = true
+            }
+            if let charging = isCharging, self._charging != charging {
+                self._charging = charging
+                updated = true
+            }
+            if let time = time, self._time != time {
+                self._time = time
+                updated = true
+            }
+            if self.timeFormat != timeFormat {
+                self.timeFormat = timeFormat
+                updated = true
+            }
+            if let state = optimizedCharging, self._optimizedCharging != state {
+                self._optimizedCharging = state
+                updated = true
+            }
         }
         
         if updated {
@@ -527,31 +529,53 @@ public class BatteryDetailsWidget: WidgetWrapper {
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         
+        var percentage: Double? = nil
+        var time: Int = 0
+        var ACStatus: Bool = false
+        var ACwatts: Int = 0
+        var batteryPower: Double = 0.0
+        var adapterPower: Double = 0.0
+        var usbDevices: [USBDevice_t] = []
+        var mode: String = ""
+        var timeFormat: String = ""
+        
+        self.queue.sync {
+            percentage = self.percentage
+            time = self.time
+            ACStatus = self.ACStatus
+            ACwatts = self.ACwatts
+            batteryPower = self.batteryPower
+            adapterPower = self.adapterPower
+            usbDevices = self.usbDevices
+            mode = self.mode
+            timeFormat = self.timeFormat
+        }
+        
         var width: CGFloat = Constants.Widget.margin.x*2
         let x: CGFloat = Constants.Widget.margin.x
-        let isShortTimeFormat: Bool = self.timeFormat == "short"
+        let isShortTimeFormat: Bool = timeFormat == "short"
         
-        switch self.mode {
+        switch mode {
         case "percentage":
             var value = "n/a"
-            if let percentage = self.percentage {
+            if let percentage {
                 value = "\(Int((percentage.rounded(toPlaces: 2)) * 100))%"
             }
             width = self.drawOneRow(value: value, x: x).rounded(.up)
         case "time":
             width = self.drawOneRow(
-                value: Double(self.time*60).printSecondsToHoursMinutesSeconds(short: isShortTimeFormat),
+                value: Double(time*60).printSecondsToHoursMinutesSeconds(short: isShortTimeFormat),
                 x: x
             ).rounded(.up)
         case "percentageAndTime":
             var value = "n/a"
-            if let percentage = self.percentage {
+            if let percentage {
                 value = "\(Int((percentage.rounded(toPlaces: 2)) * 100))%"
             }
-            if self.time > 0 {
+            if time > 0 {
                 width = self.drawTwoRows(
                     first: value,
-                    second: Double(self.time*60).printSecondsToHoursMinutesSeconds(short: isShortTimeFormat),
+                    second: Double(time*60).printSecondsToHoursMinutesSeconds(short: isShortTimeFormat),
                     x: x
                 ).rounded(.up)
             } else {
@@ -559,12 +583,12 @@ public class BatteryDetailsWidget: WidgetWrapper {
             }
         case "timeAndPercentage":
             var value = "n/a"
-            if let percentage = self.percentage {
+            if let percentage {
                 value = "\(Int((percentage.rounded(toPlaces: 2)) * 100))%"
             }
-            if self.time > 0 {
+            if time > 0 {
                 width = self.drawTwoRows(
-                    first: Double(self.time*60).printSecondsToHoursMinutesSeconds(short: isShortTimeFormat),
+                    first: Double(time*60).printSecondsToHoursMinutesSeconds(short: isShortTimeFormat),
                     second: value,
                     x: x
                 ).rounded(.up)
@@ -572,13 +596,13 @@ public class BatteryDetailsWidget: WidgetWrapper {
                 width = self.drawOneRow(value: value, x: x).rounded(.up)
             }
         case "powerFlow":
-            let usbPower = self.usbDevices.reduce(0.0) { $0 + (5.0 * Double($1.alloc) / 1000.0) }
+            let usbPower = usbDevices.reduce(0.0) { $0 + (5.0 * Double($1.alloc) / 1000.0) }
             var inStr = "IN: 0W"
-            if self.ACStatus {
-                let currentInput = (self.adapterPower > 0 && self.adapterPower.isFinite) ? self.adapterPower : Double(self.ACwatts)
+            if ACStatus {
+                let currentInput = (adapterPower > 0 && adapterPower.isFinite) ? adapterPower : Double(ACwatts)
                 inStr = "IN: \(Int(currentInput))W"
             } else {
-                let batPowerVal = abs(self.batteryPower)
+                let batPowerVal = abs(batteryPower)
                 if batPowerVal.isFinite && batPowerVal > 0 {
                     inStr = "BAT: - \(Int(batPowerVal))W"
                 }
@@ -590,9 +614,9 @@ public class BatteryDetailsWidget: WidgetWrapper {
                 x: x
             ).rounded(.up)
         case "usbStatus":
-            let fastestSpeed = self.usbDevices.map { $0.speed }.max() ?? 0
+            let fastestSpeed = usbDevices.map { $0.speed }.max() ?? 0
             var speedStr = "No Dev"
-            if !self.usbDevices.isEmpty {
+            if !usbDevices.isEmpty {
                 let mbps = Double(fastestSpeed) / 1_000_000.0
                 if mbps >= 20000 {
                     speedStr = "USB4/TB"
@@ -606,27 +630,27 @@ public class BatteryDetailsWidget: WidgetWrapper {
                     speedStr = "Unknown"
                 }
             }
-            let countStr = "USB: \(self.usbDevices.count) \(self.usbDevices.count == 1 ? "Dev" : "Devs")"
+            let countStr = "USB: \(usbDevices.count) \(usbDevices.count == 1 ? "Dev" : "Devs")"
             width = self.drawTwoRows(
                 first: countStr,
                 second: speedStr,
                 x: x
             ).rounded(.up)
         case "powerFlowAndSpeed":
-            let usbPower = self.usbDevices.reduce(0.0) { $0 + (5.0 * Double($1.alloc) / 1000.0) }
+            let usbPower = usbDevices.reduce(0.0) { $0 + (5.0 * Double($1.alloc) / 1000.0) }
             var inStr = "IN: 0W"
-            if self.ACStatus {
-                let currentInput = (self.adapterPower > 0 && self.adapterPower.isFinite) ? self.adapterPower : Double(self.ACwatts)
+            if ACStatus {
+                let currentInput = (adapterPower > 0 && adapterPower.isFinite) ? adapterPower : Double(ACwatts)
                 inStr = "IN: \(Int(currentInput))W"
             } else {
-                let batPowerVal = abs(self.batteryPower)
+                let batPowerVal = abs(batteryPower)
                 if batPowerVal.isFinite && batPowerVal > 0 {
                     inStr = "BAT: - \(Int(batPowerVal))W"
                 }
             }
-            let fastestSpeed = self.usbDevices.map { $0.speed }.max() ?? 0
+            let fastestSpeed = usbDevices.map { $0.speed }.max() ?? 0
             var speedStr = "No Dev"
-            if !self.usbDevices.isEmpty {
+            if !usbDevices.isEmpty {
                 let mbps = Double(fastestSpeed) / 1_000_000.0
                 if mbps >= 20000 {
                     speedStr = "USB4"
