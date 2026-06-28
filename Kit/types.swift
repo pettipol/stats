@@ -168,7 +168,10 @@ internal let BatteryInfo: [KeyValue_t] = [
     KeyValue_t(key: "percentage", value: "Percentage"),
     KeyValue_t(key: "time", value: "Time"),
     KeyValue_t(key: "percentageAndTime", value: "Percentage and time"),
-    KeyValue_t(key: "timeAndPercentage", value: "Time and percentage")
+    KeyValue_t(key: "timeAndPercentage", value: "Time and percentage"),
+    KeyValue_t(key: "powerFlow", value: "Power flow (IN/OUT)"),
+    KeyValue_t(key: "usbStatus", value: "USB Speed & Power"),
+    KeyValue_t(key: "powerFlowAndSpeed", value: "Power Flow & USB Speed")
 ]
 
 public let ShortLong: [KeyValue_t] = [
@@ -488,4 +491,18 @@ public struct DeviceResponse: Codable {
     public let user_code: String
     public let verification_uri_complete: URL
     public let interval: Int?
+}
+
+public struct USBDevice_t: Codable, Equatable {
+    public let name: String
+    public let vendor: String
+    public let speed: UInt64
+    public let alloc: Int
+    
+    public init(name: String, vendor: String, speed: UInt64, alloc: Int) {
+        self.name = name
+        self.vendor = vendor
+        self.speed = speed
+        self.alloc = alloc
+    }
 }

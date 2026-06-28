@@ -42,6 +42,7 @@ struct Battery_Usage: Codable {
     var timeToEmpty: Int = 0
     var timeToCharge: Int = 0
     var timeOnACPower: Date? = nil
+    var usbDevices: [USBDevice_t] = []
 }
 
 public class Battery: Module {
@@ -78,9 +79,7 @@ public class Battery: Module {
         }
         
         self.settingsView.callback = { [weak self] in
-            DispatchQueue.global(qos: .background).async {
-                self?.usageReader?.read()
-            }
+            self?.usageReader?.read()
         }
         self.settingsView.callbackWhenUpdateNumberOfProcesses = { [weak self] in
             self?.popupView.numberOfProcessesUpdated()
@@ -129,7 +128,12 @@ public class Battery: Module {
             case let widget as BatteryDetailsWidget:
                 widget.setValue(
                     percentage: value.level,
-                    time: value.timeToEmpty == 0 && value.timeToCharge != 0 ? value.timeToCharge : value.timeToEmpty
+                    time: value.timeToEmpty == 0 && value.timeToCharge != 0 ? value.timeToCharge : value.timeToEmpty,
+                    ACStatus: !value.isBatteryPowered,
+                    ACwatts: value.ACwatts,
+                    batteryPower: value.batteryPower,
+                    adapterPower: value.adapterPower,
+                    usbDevices: value.usbDevices
                 )
             default: break
             }

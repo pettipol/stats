@@ -21,6 +21,7 @@ internal class UsageReader: Reader<Battery_Usage> {
     private var usage: Battery_Usage = Battery_Usage()
     
     deinit {
+        self.stop()
         if self.service != 0 {
             IOObjectRelease(self.service)
             self.service = 0
@@ -49,15 +50,27 @@ internal class UsageReader: Reader<Battery_Usage> {
     }
     
     public override func stop() {
-        guard let runLoop = loop, let source = source else {
+        guard let source = self.source else {
             return
         }
         
         self.active = false
-        CFRunLoopRemoveSource(runLoop, source, .defaultMode)
+        CFRunLoopSourceInvalidate(source)
+        if let runLoop = self.loop {
+            CFRunLoopRemoveSource(runLoop, source, .defaultMode)
+        }
+        self.source = nil
+        self.loop = nil
     }
     
     public override func read() {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.read()
+            }
+            return
+        }
+        
         let psInfo = IOPSCopyPowerSourcesInfo().takeRetainedValue()
         let psList = IOPSCopyPowerSourcesList(psInfo).takeRetainedValue() as [CFTypeRef]
         
@@ -105,10 +118,9 @@ internal class UsageReader: Reader<Battery_Usage> {
                 var ACwatts: Int = 0
                 if let ACDetails = IOPSCopyExternalPowerAdapterDetails() {
                     if let ACList = ACDetails.takeRetainedValue() as? [String: Any] {
-                        guard let watts = ACList[kIOPSPowerAdapterWattsKey] as? Int else {
-                            return
+                        if let watts = (ACList[kIOPSPowerAdapterWattsKey] as? NSNumber)?.intValue {
+                            ACwatts = watts
                         }
-                        ACwatts = watts
                     }
                 }
                 self.usage.ACwatts = ACwatts
@@ -129,7 +141,14 @@ internal class UsageReader: Reader<Battery_Usage> {
                     }
                 }
                 
-                self.callback(self.usage)
+                DispatchQueue.global(qos: .background).async { [weak self] in
+                    guard let self = self else { return }
+                    let usbDevices = self.readUSBDevices()
+                    DispatchQueue.main.async {
+                        self.usage.usbDevices = usbDevices
+                        self.callback(self.usage)
+                    }
+                }
             }
         }
     }
@@ -186,6 +205,56 @@ internal class UsageReader: Reader<Battery_Usage> {
             return adapterDetails.takeRetainedValue() as? [String: Any]
         }
         return nil
+    }
+    
+    private func readUSBDevices() -> [USBDevice_t] {
+        var devices: [USBDevice_t] = []
+        let matchingDict = IOServiceMatching("IOUSBHostDevice")
+        var iterator: io_iterator_t = 0
+        
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matchingDict, &iterator) == KERN_SUCCESS else {
+            return []
+        }
+        
+        var service = IOIteratorNext(iterator)
+        var seenKeys = Set<String>()
+        
+        while service != 0 {
+            var serviceProperties: Unmanaged<CFMutableDictionary>?
+            let kr = IORegistryEntryCreateCFProperties(service, &serviceProperties, kCFAllocatorDefault, 0)
+            if kr == KERN_SUCCESS, let props = serviceProperties?.takeRetainedValue() as NSDictionary? {
+                let name = props["kUSBProductString"] as? String ?? props["USB Product Name"] as? String ?? "USB Device"
+                let vendor = props["kUSBVendorString"] as? String ?? props["USB Vendor Name"] as? String ?? "Unknown"
+                let serial = props["kUSBSerialNumberString"] as? String ?? props["USB Serial Number"] as? String ?? ""
+                
+                var speed: UInt64 = 0
+                if let linkSpeed = (props["UsbLinkSpeed"] as? NSNumber)?.uint64Value {
+                    speed = linkSpeed
+                } else if let usbSpeed = (props["USBSpeed"] as? NSNumber)?.intValue {
+                    switch usbSpeed {
+                    case 0: speed = 1_500_000      // Low Speed (1.5 Mbps)
+                    case 1: speed = 12_000_000     // Full Speed (12 Mbps)
+                    case 2: speed = 480_000_000    // High Speed (480 Mbps)
+                    case 3: speed = 5_000_000_000  // SuperSpeed (5 Gbps)
+                    case 4: speed = 10_000_000_000 // SuperSpeed+ (10 Gbps)
+                    default: speed = 0
+                    }
+                }
+                
+                let alloc = (props["UsbPowerSinkAllocation"] as? NSNumber)?.intValue
+                            ?? (props["kUSBConfigurationCurrentOverride"] as? NSNumber)?.intValue ?? 0
+                
+                let uniqueKey = "\(name)-\(vendor)-\(serial)"
+                if !seenKeys.contains(uniqueKey) {
+                    seenKeys.insert(uniqueKey)
+                    devices.append(USBDevice_t(name: name, vendor: vendor, speed: speed, alloc: alloc))
+                }
+            }
+            IOObjectRelease(service)
+            service = IOIteratorNext(iterator)
+        }
+        IOObjectRelease(iterator)
+        return devices
     }
 }
 

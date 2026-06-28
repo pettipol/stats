@@ -43,6 +43,8 @@ internal class Popup: PopupWrapper {
     private var processes: ProcessesView? = nil
     private var processesInitialized: Bool = false
     
+    private var usbView: NSStackView? = nil
+    
     private let usageCache = PopupCache<Battery_Usage>()
     
     private var numberOfProcesses: Int {
@@ -64,6 +66,7 @@ internal class Popup: PopupWrapper {
         self.addArrangedSubview(self.initDashboard())
         self.addArrangedSubview(self.initDetails())
         self.addArrangedSubview(self.initBattery())
+        self.addArrangedSubview(self.initUSB())
         self.addArrangedSubview(self.initProcesses())
         
         self.recalculateHeight()
@@ -327,7 +330,7 @@ internal class Popup: PopupWrapper {
                 self.recalculateHeight()
             }
             
-            let current = value.adapterVoltage > 0 ? Int((value.adapterPower / value.adapterVoltage) * 1000) : 0
+            let current = (value.adapterVoltage > 0 && value.adapterPower.isFinite && value.adapterVoltage.isFinite) ? Int((value.adapterPower / value.adapterVoltage) * 1000) : 0
             self.powerField?.stringValue = "\(value.adapterPower.roundTo(decimalPlaces: 2)) W"
             self.currentField?.stringValue = "\(current) mA"
             self.voltageField?.stringValue = "\(value.adapterVoltage.roundTo(decimalPlaces: 2)) V"
@@ -352,6 +355,56 @@ internal class Popup: PopupWrapper {
         self.healthField?.stringValue = "\(value.health)%"
         self.cyclesField?.stringValue = "\(value.cycles)"
         self.temperatureField?.stringValue = temperature(value.temperature)
+        
+        if let usbView = self.usbView {
+            usbView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            
+            if !value.usbDevices.isEmpty {
+                usbView.addArrangedSubview(SeparatorView(label: "USB Peripherals"))
+                for dev in value.usbDevices {
+                    let name = dev.name
+                    let speedVal = dev.speed
+                    let allocVal = dev.alloc
+                    
+                    var speedStr = localizedString("Unknown")
+                    let mbps = Double(speedVal) / 1_000_000.0
+                    if mbps >= 20000 {
+                        speedStr = String(format: "%.0f Gbps (USB4/TB)", mbps / 1000.0)
+                    } else if mbps >= 1000 {
+                        speedStr = String(format: "%.0f Gbps (USB 3.x)", mbps / 1000.0)
+                    } else if mbps >= 12 {
+                        speedStr = mbps >= 480 ? "480 Mbps (USB 2.0)" : "12 Mbps (USB 1.1)"
+                    } else if mbps > 0 {
+                        speedStr = "1.5 Mbps (USB 1.0)"
+                    }
+                    
+                    var powerStr = "N/A"
+                    if allocVal > 0 {
+                        let watts = (5.0 * Double(allocVal)) / 1000.0
+                        powerStr = String(format: "%.1fW", watts)
+                    }
+                    
+                    let row = NSStackView()
+                    row.orientation = .horizontal
+                    row.distribution = .fill
+                    row.spacing = 4
+                    row.edgeInsets = NSEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+                    
+                    let titleLabel = LabelField(frame: .zero, name, size: 11)
+                    titleLabel.textColor = .labelColor
+                    
+                    let infoLabel = LabelField(frame: .zero, "\(speedStr) | \(powerStr)", size: 10)
+                    infoLabel.textColor = .secondaryLabelColor
+                    infoLabel.alignment = .right
+                    
+                    row.addArrangedSubview(titleLabel)
+                    row.addArrangedSubview(infoLabel)
+                    
+                    usbView.addArrangedSubview(row)
+                }
+            }
+            self.recalculateHeight()
+        }
     }
     
     public func processCallback(_ list: [TopProcess]) {
@@ -384,6 +437,14 @@ internal class Popup: PopupWrapper {
         })
     }
     
+    private func initUSB() -> NSView {
+        let view = NSStackView(frame: NSRect(x: 0, y: 0, width: self.frame.width, height: 0))
+        view.orientation = .vertical
+        view.spacing = 0
+        self.usbView = view
+        return view
+    }
+    
     // MARK: - Settings
     
     public override func settings() -> NSView? {
@@ -391,7 +452,9 @@ internal class Popup: PopupWrapper {
         
         view.addArrangedSubview(PreferencesSection([
             PreferencesRow(localizedString("Keyboard shortcut"), component: KeyboardShartcutView(
-                callback: self.setKeyboardShortcut,
+                callback: { [weak self] shortcut in
+                    self?.setKeyboardShortcut(shortcut)
+                },
                 value: self.keyboardShortcut
             ))
         ]))

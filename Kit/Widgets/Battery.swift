@@ -489,6 +489,11 @@ public class BatteryDetailsWidget: WidgetWrapper {
     
     private var percentage: Double? = nil
     private var time: Int = 0
+    private var ACStatus: Bool = false
+    private var ACwatts: Int = 0
+    private var batteryPower: Double = 0.0
+    private var adapterPower: Double = 0.0
+    private var usbDevices: [USBDevice_t] = []
     
     public init(title: String, preview: Bool = false) {
         super.init(.batteryDetails, title: title, frame: CGRect(
@@ -504,6 +509,11 @@ public class BatteryDetailsWidget: WidgetWrapper {
             self.percentage = 0.72
             self.time = 415
             self.mode = "percentageAndTime"
+            self.ACStatus = true
+            self.ACwatts = 140
+            self.batteryPower = 15.0
+            self.adapterPower = 45.0
+            self.usbDevices = [USBDevice_t(name: "iPad", vendor: "Apple", speed: 480_000_000, alloc: 2400)]
         } else {
             self.mode = Store.shared.string(key: "\(self.title)_\(self.type.rawValue)_mode", defaultValue: self.mode)
             self.timeFormat = Store.shared.string(key: "\(self.title)_timeFormat", defaultValue: self.timeFormat)
@@ -561,6 +571,81 @@ public class BatteryDetailsWidget: WidgetWrapper {
             } else {
                 width = self.drawOneRow(value: value, x: x).rounded(.up)
             }
+        case "powerFlow":
+            let usbPower = self.usbDevices.reduce(0.0) { $0 + (5.0 * Double($1.alloc) / 1000.0) }
+            var inStr = "IN: 0W"
+            if self.ACStatus {
+                let currentInput = (self.adapterPower > 0 && self.adapterPower.isFinite) ? self.adapterPower : Double(self.ACwatts)
+                inStr = "IN: \(Int(currentInput))W"
+            } else {
+                let batPowerVal = abs(self.batteryPower)
+                if batPowerVal.isFinite && batPowerVal > 0 {
+                    inStr = "BAT: - \(Int(batPowerVal))W"
+                }
+            }
+            let outStr = "USB: \(String(format: "%.1f", usbPower))W"
+            width = self.drawTwoRows(
+                first: inStr,
+                second: outStr,
+                x: x
+            ).rounded(.up)
+        case "usbStatus":
+            let fastestSpeed = self.usbDevices.map { $0.speed }.max() ?? 0
+            var speedStr = "No Dev"
+            if !self.usbDevices.isEmpty {
+                let mbps = Double(fastestSpeed) / 1_000_000.0
+                if mbps >= 20000 {
+                    speedStr = "USB4/TB"
+                } else if mbps >= 1000 {
+                    speedStr = String(format: "%.0fG", mbps / 1000.0)
+                } else if mbps >= 12 {
+                    speedStr = mbps >= 480 ? "480M" : "12M"
+                } else if mbps > 0 {
+                    speedStr = "1.5M"
+                } else {
+                    speedStr = "Unknown"
+                }
+            }
+            let countStr = "USB: \(self.usbDevices.count) \(self.usbDevices.count == 1 ? "Dev" : "Devs")"
+            width = self.drawTwoRows(
+                first: countStr,
+                second: speedStr,
+                x: x
+            ).rounded(.up)
+        case "powerFlowAndSpeed":
+            let usbPower = self.usbDevices.reduce(0.0) { $0 + (5.0 * Double($1.alloc) / 1000.0) }
+            var inStr = "IN: 0W"
+            if self.ACStatus {
+                let currentInput = (self.adapterPower > 0 && self.adapterPower.isFinite) ? self.adapterPower : Double(self.ACwatts)
+                inStr = "IN: \(Int(currentInput))W"
+            } else {
+                let batPowerVal = abs(self.batteryPower)
+                if batPowerVal.isFinite && batPowerVal > 0 {
+                    inStr = "BAT: - \(Int(batPowerVal))W"
+                }
+            }
+            let fastestSpeed = self.usbDevices.map { $0.speed }.max() ?? 0
+            var speedStr = "No Dev"
+            if !self.usbDevices.isEmpty {
+                let mbps = Double(fastestSpeed) / 1_000_000.0
+                if mbps >= 20000 {
+                    speedStr = "USB4"
+                } else if mbps >= 1000 {
+                    speedStr = String(format: "%.0fG", mbps / 1000.0)
+                } else if mbps >= 12 {
+                    speedStr = mbps >= 480 ? "480M" : "12M"
+                } else if mbps > 0 {
+                    speedStr = "1.5M"
+                } else {
+                    speedStr = "Unknown"
+                }
+            }
+            let outStr = "USB: \(String(format: "%.1f", usbPower))W (\(speedStr))"
+            width = self.drawTwoRows(
+                first: inStr,
+                second: outStr,
+                x: x
+            ).rounded(.up)
         default: break
         }
         
@@ -606,7 +691,30 @@ public class BatteryDetailsWidget: WidgetWrapper {
         return rowWidth
     }
     
-    public func setValue(percentage: Double? = nil, time: Int? = nil) {
+    public func setValue(
+        percentage: Double? = nil,
+        time: Int? = nil,
+        ACStatus: Bool = false,
+        ACwatts: Int = 0,
+        batteryPower: Double = 0.0,
+        adapterPower: Double = 0.0,
+        usbDevices: [USBDevice_t] = []
+    ) {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.setValue(
+                    percentage: percentage,
+                    time: time,
+                    ACStatus: ACStatus,
+                    ACwatts: ACwatts,
+                    batteryPower: batteryPower,
+                    adapterPower: adapterPower,
+                    usbDevices: usbDevices
+                )
+            }
+            return
+        }
+        
         var updated: Bool = false
         let timeFormat: String = Store.shared.string(key: "\(self.title)_timeFormat", defaultValue: self.timeFormat)
         
@@ -620,6 +728,26 @@ public class BatteryDetailsWidget: WidgetWrapper {
         }
         if self.timeFormat != timeFormat {
             self.timeFormat = timeFormat
+            updated = true
+        }
+        if self.ACStatus != ACStatus {
+            self.ACStatus = ACStatus
+            updated = true
+        }
+        if self.ACwatts != ACwatts {
+            self.ACwatts = ACwatts
+            updated = true
+        }
+        if self.batteryPower != batteryPower {
+            self.batteryPower = batteryPower
+            updated = true
+        }
+        if self.adapterPower != adapterPower {
+            self.adapterPower = adapterPower
+            updated = true
+        }
+        if self.usbDevices != usbDevices {
+            self.usbDevices = usbDevices
             updated = true
         }
         
