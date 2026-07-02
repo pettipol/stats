@@ -268,6 +268,18 @@ internal class Preview: PreviewWrapper {
         return view
     }
     
+    // Removes a specific NSGridRow only when it is still present at a valid, matching index.
+    // NSGridView.removeRow(at:) raises an NSRangeException (uncaught -> abort/SIGABRT) when the
+    // index is out of range, or points at a row that shifted after a previous removal; guarding
+    // on NSNotFound alone is not enough. This was the Disk-preview crash on macOS 26 (Tahoe).
+    private func removeGridRow(_ target: NSGridRow?) {
+        guard let target = target else { return }
+        let idx = self.disks.index(of: target)
+        guard idx != NSNotFound, idx >= 0, idx < self.disks.numberOfRows else { return }
+        guard self.disks.row(at: idx) === target else { return }
+        self.disks.removeRow(at: idx)
+    }
+
     internal func capacityCallback(_ value: Disks) {
         DispatchQueue.main.async(execute: {
             if (self.window?.isVisible ?? false) || !self.initialized {
@@ -311,19 +323,14 @@ internal class Preview: PreviewWrapper {
                 let driveUUIDs = Set(drives.map { $0.uuid })
                 for uuid in Array(self.diskRows.keys) where !driveUUIDs.contains(uuid) {
                     if let row = self.diskRows[uuid] {
+                        // Remove the grid rows FIRST (identity + bounds checked), then detach the
+                        // cell views. Stripping the cells before removeRow(at:) desyncs NSGridView's
+                        // internal row/cell bookkeeping and makes removeRowAtIndex throw.
+                        self.removeGridRow(row.gridRow)
+                        self.removeGridRow(row.separatorRow)
                         row.cells.forEach { $0.removeFromSuperview() }
-                        if let gridRow = row.gridRow {
-                            let index = self.disks.index(of: gridRow)
-                            if index != NSNotFound {
-                                self.disks.removeRow(at: index)
-                            }
-                        }
-                        if let sepRow = row.separatorRow {
-                            let index = self.disks.index(of: sepRow)
-                            if index != NSNotFound {
-                                self.disks.removeRow(at: index)
-                            }
-                        }
+                        row.gridRow = nil
+                        row.separatorRow = nil
                         self.diskRows.removeValue(forKey: uuid)
                     }
                 }
@@ -334,11 +341,8 @@ internal class Preview: PreviewWrapper {
                         return idx == NSNotFound ? nil : (row, idx)
                     }
                     .min(by: { $0.index < $1.index })?.row
-                if let firstRow = firstRow, let sepRow = firstRow.separatorRow {
-                    let index = self.disks.index(of: sepRow)
-                    if index != NSNotFound {
-                        self.disks.removeRow(at: index)
-                    }
+                if let firstRow = firstRow, firstRow.separatorRow != nil {
+                    self.removeGridRow(firstRow.separatorRow)
                     firstRow.separatorRow = nil
                 }
                 
@@ -363,7 +367,7 @@ internal class Preview: PreviewWrapper {
                             row.separatorRow = sepRow
                         }
                         row.gridRow = self.disks.addRow(with: row.cells)
-                        if isFirst {
+                        if isFirst, self.disks.numberOfColumns >= 3 {
                             self.disks.column(at: 0).xPlacement = .leading
                             self.disks.column(at: 1).xPlacement = .center
                             self.disks.column(at: 2).xPlacement = .trailing
