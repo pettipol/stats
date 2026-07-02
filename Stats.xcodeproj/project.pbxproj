@@ -2613,7 +2613,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Clock;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Clock;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2651,7 +2651,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Clock;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Clock;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2690,7 +2690,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -2730,7 +2730,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -2765,7 +2765,7 @@
 					__launchd_plist,
 					"\"$(SRCROOT)/SMC/Helper/Launchd.plist\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.SMC.Helper;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.SMC.Helper;
 				PRODUCT_NAME = eu.exelban.Stats.SMC.Helper;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2797,7 +2797,7 @@
 					__launchd_plist,
 					"\"$(SRCROOT)/SMC/Helper/Launchd.plist\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.SMC.Helper;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.SMC.Helper;
 				PRODUCT_NAME = eu.exelban.Stats.SMC.Helper;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2835,7 +2835,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Remote;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Remote;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2880,7 +2880,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Remote;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Remote;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2917,7 +2917,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Bluetooth;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Bluetooth;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -2951,7 +2951,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Bluetooth;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Bluetooth;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3122,7 +3122,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 3.0.5;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -3159,7 +3159,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 3.0.5;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
@@ -3194,7 +3194,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-w";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Kit;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Kit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3231,7 +3231,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-w";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Kit;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Kit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3262,7 +3262,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.LaunchAtLogin;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.LaunchAtLogin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3291,7 +3291,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.LaunchAtLogin;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.LaunchAtLogin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3322,7 +3322,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Net;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Net;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3356,7 +3356,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Net;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Net;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3389,7 +3389,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.RAM;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.RAM;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3423,7 +3423,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.RAM;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.RAM;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3457,7 +3457,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.GPU;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.GPU;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3493,7 +3493,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.GPU;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.GPU;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3532,7 +3532,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.CPU;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.CPU;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3573,7 +3573,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.CPU;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.CPU;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3656,7 +3656,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Battery;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Battery;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3690,7 +3690,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Battery;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Battery;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3716,7 +3716,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.SMC;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.SMC;
 				PRODUCT_NAME = smc;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3740,7 +3740,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.SMC;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.SMC;
 				PRODUCT_NAME = smc;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3771,7 +3771,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Sensors;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Sensors;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3806,7 +3806,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Sensors;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Sensors;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3841,7 +3841,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Disk;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Disk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -3877,7 +3877,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.Stats.Disk;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.exelban.StatsDebug.Disk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
